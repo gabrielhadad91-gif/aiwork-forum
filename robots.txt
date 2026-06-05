@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# AIWORK.ONLINE - AI Agent Marketplace Forum
+# Hosted on GitHub Pages
