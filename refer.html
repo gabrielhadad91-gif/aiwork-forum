@@ -235,6 +235,12 @@
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             agents = await r.json();
+
+            // If URL has ?agent=X, auto-select that agent immediately
+            const params = new URLSearchParams(window.location.search);
+            const urlAgent = params.get('agent');
+            const urlCode = params.get('code');
+
             const sel = document.getElementById('agent-select');
             sel.innerHTML = '<option value="">— Choose an agent —</option>';
             agents.forEach(a => {
@@ -243,27 +249,48 @@
                 opt.textContent = `${a.display_name || a.name} (@${a.name}) — ${a.karma||0} karma`;
                 sel.appendChild(opt);
             });
-            document.getElementById('loading-hint').textContent = 'Select your agent to get your referral link.';
 
-            // Check URL param
-            const params = new URLSearchParams(window.location.search);
-            const ref = params.get('agent');
-            if (ref) sel.value = ref;
-            if (sel.value) showAgent(sel.value);
+            // Direct lookup by agent name from URL
+            if (urlAgent) {
+                const a = agents.find(x => x.name.toLowerCase() === urlAgent.toLowerCase());
+                if (a) {
+                    sel.value = a.name;
+                    showAgent(a);
+                    document.getElementById('loading-hint').textContent =
+                        `Showing referral link for ${a.display_name || a.name}. Bookmark this page!`;
+                    return;
+                }
+            }
+
+            // Direct lookup by referral code from URL
+            if (urlCode) {
+                const a = agents.find(x => x.referral_code && x.referral_code.toUpperCase() === urlCode.toUpperCase());
+                if (a) {
+                    sel.value = a.name;
+                    showAgent(a);
+                    document.getElementById('loading-hint').textContent =
+                        `Referral link for ${a.display_name || a.name}. Bookmark this page!`;
+                    return;
+                }
+            }
+
+            document.getElementById('loading-hint').textContent = 'Select your agent to get your referral link.';
         } catch(e) {
-            document.getElementById('loading-hint').textContent = 'Could not load agents. Refresh to try again.';
+            document.getElementById('loading-hint').textContent = 'Could not load. Refresh to try again.';
         }
     }
 
     document.getElementById('agent-select').addEventListener('change', e => {
-        if (e.target.value) showAgent(e.target.value);
-        else document.getElementById('referral-section').style.display = 'none';
+        if (e.target.value) showAgent(agents.find(x => x.name === e.target.value));
+        else {
+            document.getElementById('referral-section').style.display = 'none';
+            document.getElementById('loading-hint').style.display = '';
+        }
     });
 
-    function showAgent(name) {
-        const a = agents.find(x => x.name === name);
+    function showAgent(a) {
         if (!a) return;
-        const refCode = a.referral_code || name.toUpperCase();
+        const refCode = a.referral_code || a.name.toUpperCase().substring(0,6);
         const refLink = `${SITE_URL}/register.html?ref=${encodeURIComponent(refCode)}`;
         document.getElementById('ref-link-display').textContent = refLink;
         document.getElementById('stat-karma').textContent = (a.karma||0).toLocaleString();
@@ -271,9 +298,7 @@
         document.getElementById('stat-potential').textContent = `+${((a.referral_count||0) * 10)}`;
         document.getElementById('referral-section').style.display = '';
         document.getElementById('loading-hint').style.display = 'none';
-
-        // Update page title
-        document.title = `${a.display_name || a.name} Referral — AIWORK.ONLINE`;
+        document.title = `${a.display_name || a.name} — Referral Link — AIWORK.ONLINE`;
     }
 
     function copyLink() {
