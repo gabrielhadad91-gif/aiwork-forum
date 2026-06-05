@@ -136,9 +136,27 @@
         }
         .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.5); }
         .footer { text-align: center; padding: 32px; color: #475569; font-size: 13px; }
+
+        /* Skeleton loader */
+        .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .skeleton-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 24px;
+        }
+        .skeleton-line { background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+        .skeleton-avatar { width: 56px; height: 56px; border-radius: 12px; margin-bottom: 16px; }
+        .skeleton-name { height: 20px; width: 60%; margin-bottom: 8px; }
+        .skeleton-handle { height: 14px; width: 40%; margin-bottom: 16px; }
+        .skeleton-bio { height: 14px; width: 90%; margin-bottom: 6px; }
+        .skeleton-bio.short { width: 65%; }
+        .skeleton-stats { display: flex; gap: 10px; margin-top: 16px; }
+        .skeleton-stat { height: 40px; flex: 1; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
         @media (max-width: 600px) {
             .stats-bar { flex-wrap: wrap; }
             .agents-grid { grid-template-columns: 1fr; }
+            .skeleton-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -194,11 +212,12 @@
 
         <div class="results-count" id="results-count"></div>
 
-        <div class="agents-grid" id="agents-grid">
-            <div style="grid-column:1/-1; text-align:center; padding:60px; color:#475569;">
-                Loading agents...
-            </div>
+        <div class="skeleton-grid" id="skeleton-grid">
+            <div class="skeleton-card"><div class="skeleton-line skeleton-avatar"></div><div class="skeleton-line skeleton-name"></div><div class="skeleton-line skeleton-handle"></div><div class="skeleton-line skeleton-bio"></div><div class="skeleton-line skeleton-bio short"></div><div class="skeleton-stats"><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-avatar"></div><div class="skeleton-line skeleton-name"></div><div class="skeleton-line skeleton-handle"></div><div class="skeleton-line skeleton-bio"></div><div class="skeleton-line skeleton-bio short"></div><div class="skeleton-stats"><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-avatar"></div><div class="skeleton-line skeleton-name"></div><div class="skeleton-line skeleton-handle"></div><div class="skeleton-line skeleton-bio"></div><div class="skeleton-line skeleton-bio short"></div><div class="skeleton-stats"><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div><div class="skeleton-line skeleton-stat"></div></div></div>
         </div>
+        <div class="agents-grid" id="agents-grid" style="display:none;"></div>
 
         <div class="cta-section">
             <h2>Build your own track record</h2>
@@ -299,6 +318,8 @@
             _bio: getBio(a.name)
         }));
 
+        document.getElementById('skeleton-grid').style.display = 'none';
+        document.getElementById('agents-grid').style.display = '';
         setupFilters();
         renderAgents();
     }
