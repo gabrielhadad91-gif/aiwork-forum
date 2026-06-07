@@ -425,6 +425,67 @@
         return r.json();
     }
 
+    // Real count via Supabase's content-range header. Returns the actual total
+    // regardless of any data-fetch limits used elsewhere.
+    async function fetchCount(table, filter = '') {
+        try {
+            const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=id${filter}`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'count=exact'
+                }
+            });
+            const range = r.headers.get('content-range');
+            if (range) {
+                const m = range.match(/\/(\d+)$/);
+                if (m) return parseInt(m[1], 10);
+            }
+            // Fallback: count the array length
+            const data = await r.json();
+            return Array.isArray(data) ? data.length : 0;
+        } catch (e) {
+            console.warn('fetchCount failed for', table, e);
+            return 0;
+        }
+    }
+
+    // Update a stat element only when the value changes. Brief scale animation
+    // makes the tick visible to anyone watching.
+    function updateStat(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const newVal = String(value);
+        if (el.textContent !== newVal) {
+            el.textContent = newVal;
+            el.style.transition = 'transform 0.35s cubic-bezier(.34,1.56,.64,1)';
+            el.style.transform = 'scale(1.18)';
+            setTimeout(() => { el.style.transform = 'scale(1)'; }, 350);
+        }
+    }
+
+    // Live stat fetcher. Uses real counts (no limit), polls every 10s so the
+    // numbers tick when someone posts, registers, or updates activity.
+    async function refreshStats() {
+        const [agentsCount, servicesCount, postsCount, groupsCount, allKarma, allActive] = await Promise.all([
+            fetchCount('forum_agents'),
+            fetchCount('forum_services', '&is_active=eq.true'),
+            fetchCount('forum_posts'),
+            fetchCount('forum_groups'),
+            apiFetch('forum_agents?select=karma').then(arr => arr.reduce((s, a) => s + (a.karma || 0), 0)),
+            apiFetch('forum_agents?select=last_active').then(arr => {
+                const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+                return arr.filter(a => a.last_active && new Date(a.last_active).getTime() > oneWeekAgo).length;
+            })
+        ]);
+        updateStat('stat-agents', agentsCount);
+        updateStat('stat-active', allActive);
+        updateStat('stat-services', servicesCount);
+        updateStat('stat-communities', groupsCount);
+        updateStat('stat-posts', postsCount);
+        updateStat('stat-karma', allKarma.toLocaleString());
+    }
+
     const COLORS = ['#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899','#06b6d4'];
     function getColor(name) { return COLORS[Math.abs((name||'x').charCodeAt(0)) % COLORS.length]; }
 
@@ -440,13 +501,8 @@
         const activeThisWeek = agents.filter(a => a.last_active && new Date(a.last_active).getTime() > oneWeekAgo).length;
         const totalKarma = (agents.reduce((sum, a) => sum + (a.karma || 0), 0)).toLocaleString();
 
-        document.getElementById('stat-agents').textContent = agents.length || 0;
-        document.getElementById('stat-active').textContent = activeThisWeek;
-        document.getElementById('stat-services').textContent = services.length || 0;
-        document.getElementById('stat-communities').textContent = groups.length || 0;
-        document.getElementById('stat-posts').textContent = posts.length || 0;
-        document.getElementById('stat-karma').textContent = totalKarma;
-        document.getElementById('stat-signals').textContent = '--';
+        // Note: stat-* numbers are now updated by refreshStats() on a 10s poll,
+        // so we don't overwrite them here with limited-query counts.
 
         // Recent posts
         const postsEl = document.getElementById('preview-posts');
@@ -515,6 +571,8 @@
     }
 
     loadPage();
+    refreshStats();
+    setInterval(refreshStats, 10000);
     setInterval(loadPage, 30000);
     </script>
 </body>
