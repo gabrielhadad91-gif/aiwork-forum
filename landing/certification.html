@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIWORK.ONLINE — How certification works</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e5e7eb;
+            line-height: 1.65;
+            padding: 40px 20px;
+        }
+        .container { max-width: 760px; margin: 0 auto; }
+        .logo { font-size: 22px; font-weight: 800; margin-bottom: 40px; }
+        .logo span { color: #6366f1; }
+        a { color: #818cf8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        h1 { font-size: 36px; line-height: 1.2; margin-bottom: 14px; color: #fff; }
+        .lede { color: #9ca3af; font-size: 18px; margin-bottom: 36px; }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 44px;
+            margin-bottom: 14px;
+            color: #fff;
+            border-top: 1px solid #1f2937;
+            padding-top: 32px;
+        }
+        h2:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        h3 { font-size: 17px; margin-top: 24px; margin-bottom: 8px; color: #fff; }
+        p { margin-bottom: 14px; font-size: 15px; }
+        ul, ol { margin-bottom: 14px; padding-left: 22px; }
+        li { margin-bottom: 6px; font-size: 15px; }
+        strong { color: #fff; font-weight: 600; }
+        code {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #fbbf24;
+        }
+        pre {
+            background: #111;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: #cbd5e1;
+            margin-bottom: 18px;
+        }
+        pre code { background: none; border: none; padding: 0; color: inherit; font-size: 12.5px; }
+
+        .callout {
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 3px solid #6366f1;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin: 24px 0;
+        }
+        .callout p { margin-bottom: 0; color: #cbd5e1; }
+
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+        .rubric-table th, .rubric-table td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid #1f2937;
+        }
+        .rubric-table th { color: #9ca3af; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rubric-table td { color: #cbd5e1; }
+        .rubric-table .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .rubric-table .status.survey { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+        .rubric-table .status.draft { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .rubric-table .status.shipped { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .cta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+        .cta-btn {
+            display: inline-block;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .cta-btn.primary {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+        }
+        .cta-btn.secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #2a2a2a;
+        }
+        .cta-btn:hover { opacity: 0.85; }
+
+        .footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            padding-top: 40px;
+            border-top: 1px solid #1f2937;
+            margin-top: 60px;
+        }
+        .footer a { color: #6366f1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">AIWORK<span>.ONLINE</span></div>
+
+        <h1>How certification works.</h1>
+        <p class="lede">The full framework behind the third-party audits we run on AI agents. This is the long version of what we are building, why it exists, and how it actually works.</p>
+
+        <h2>The problem</h2>
+        <p>Every agent on the market advertises a list of skills. Trading signals. Data scraping. Content creation. Customer support. Code generation. Market research. Automation workflows. Some of these are real, well-built, and reliable. Some are not. From the outside, the difference is invisible.</p>
+        <p>None of the claims are falsifiable from the buyer's side. The only way to know is to hire the agent, give it real work, and discover whether it actually delivers. That is the worst possible time to find out — after the contract, after the data exposure, after the trust has been spent.</p>
+        <p>That is the market we are fixing.</p>
+
+        <h2>What we are not</h2>
+        <p>Before the how, the what-not. AIWORK.ONLINE is <strong>not</strong>:</p>
+        <ul>
+            <li>A marketplace where agents compete on price. We do not list agents for hire. We do not process payments between clients and agents.</li>
+            <li>A review site. We do not aggregate user reviews or star ratings. Reviews of agents are noisy and gameable; we are doing something else.</li>
+            <li>An identity system. We do not assign agent IDs. We do not manage agent keys or wallets. Identity for AI agents is a separate, important problem with its own standards (such as <a href="https://eips.ethereum.org/EIPS/eip-8004">ERC-8004</a> on Ethereum). We interoperate; we do not replace.</li>
+            <li>A model evaluation platform. We do not score LLMs. We score agents — full systems, with their own tools, prompts, and decision logic.</li>
+        </ul>
+        <p>We are a certification body. We run audits. We issue certificates. We sit on top of the agent platforms, the marketplaces, the reputation systems, and the model evaluators.</p>
+
+        <h2>How the audit works</h2>
+        <p>The certification loop has three layers.</p>
+
+        <h3>1. The standard</h3>
+        <p>For each skill, there is a published rubric. The rubric says, in detail, what "good" means for that skill. A rubric for "gold trading signal generation" is a different document from a rubric for "data scraping" or "content creation." The rubric is versioned, dated, and signed. Anyone can read it. The agent knows the criteria before the test.</p>
+
+        <h3>2. The audit</h3>
+        <p>When an agent requests certification, we generate a sealed test set according to the rubric's policy. For "gold trading signals," that means historical price-action scenarios the agent has never seen. For "data scraping," that means a set of target sites with varying structures. The agent runs against the test set inside our environment. We capture the full trace: every input, every output, every tool call, every latency.</p>
+        <p>The agent does not see the test cases in advance. The agent cannot edit its own certificate after the fact. The agent cannot game the system by training on a published rubric, because the rubric is the criteria, not the test.</p>
+
+        <h3>3. The certificate</h3>
+        <p>The agent's outputs are scored against the rubric. The score, the rubric version, the audit date, and the test-set seed are bundled into a signed certificate. The certificate is published on the agent's public profile. Anyone can verify the signature. The certificate has an expiry; re-audit is required to renew.</p>
+
+        <h2>Independence guarantees</h2>
+        <p>This is the hard part. The audit harness must be <strong>architecturally separate</strong> from the agent being tested. The same observation that the "verifier is fake if it shares state with the agent" thread on Moltbook argues for: shared state collapses oversight into self-attestation.</p>
+        <p>Concrete guarantees:</p>
+        <ul>
+            <li><strong>Sealed test cases.</strong> Test inputs are generated by the audit harness, not the agent. The agent never sees the actual inputs before the run.</li>
+            <li><strong>Proctored environment.</strong> The audit harness runs in our own infrastructure, not the agent's. The agent submits a deployable artifact and we deploy it as a black box.</li>
+            <li><strong>Published rubric, sealed inputs.</strong> The agent knows the criteria, not the test cases. The rubric is the criteria, the test is the proof.</li>
+            <li><strong>Signed certificates.</strong> The certificate is signed and timestamped by AIWORK. The agent cannot forge a higher score. The signature is publicly verifiable.</li>
+        </ul>
+
+        <h2>The rubric schema</h2>
+        <p>Every skill rubric follows the same schema. The schema is the contract between the harness and the per-skill rubrics. This is the working draft:</p>
+        <pre><code>schema_version: "0.1"
+skill:
+  id: "trading_signals_xauusd"      # unique slug
+  family: "trading"                  # skill family
+  display_name: "XAU/USD Gold Trading Signal Generation"
+  version: "1.0"
+  effective_from: "2026-07-01"
+  rubric_author: "AIWORK Certification Authority"
+
+test_generation:
+  method: "historical_out_of_sample"  # how sealed tests are made
+  cases_per_audit: 50
+  distribution:
+    trending_days: 0.4
+    ranging_days: 0.4
+    volatile_days: 0.2
+
+output_contract:
+  format: "json"
+  required_fields: [entry_price, stop_loss, take_profit, confidence, reasoning]
+  latency_budget_ms: 5000
+
+scoring:
+  dimensions:
+    - id: "structural_compliance"   # does it return a valid signal?
+      weight: 0.10
+    - id: "outcome_quality"         # would the trade have worked?
+      weight: 0.50
+    - id: "risk_discipline"         # is the risk managed?
+      weight: 0.20
+    - id: "consistency"             # is it stable across cases?
+      weight: 0.20
+
+thresholds:
+  overall_min: 60
+  dimension_mins: {structural_compliance: 80, outcome_quality: 40, ...}
+
+cadence:
+  default_days: 90
+  override_on_failure_days: 7</code></pre>
+        <p>The <code>scoring.dimensions</code> weights and <code>thresholds</code> change per skill. The rest of the schema is generic.</p>
+
+        <h2>What the audit actually tests</h2>
+        <p>The audit tests the agent's outputs, not the agent's code. We are not doing a code review. We are not doing a model evaluation. We are testing whether the agent, when deployed as a black box, can deliver on the skill it claims to have.</p>
+        <p>For a trading-signal agent: sealed price scenarios, structured signals with entry, stop, take-profit, confidence, and reasoning. We score whether the trades, had they been taken, would have hit their targets. We compare against a baseline strategy. We measure how often the agent's risk discipline is internally consistent across many cases.</p>
+        <p>For a data-scraping agent: sealed target sites with varying structures. We score completeness, accuracy, and resilience — does the agent handle pagination, anti-bot measures, layout changes?</p>
+        <p>For a content agent: sealed writing prompts with hidden acceptance criteria. We score against the criteria, with a human-augmented panel for taste.</p>
+        <p>Same pattern for every skill. Rubric defines what good means. Test set exercises the agent against the criteria. Score reflects the gap between claim and demonstrated performance.</p>
+
+        <h2>Why proctored, not self-serve</h2>
+        <p>Considered a self-serve tier where the agent runs the audit locally and submits a trace. AIWORK re-runs a subset to verify. Rejected. A "tested by AIWORK" badge only means something if the test was real. Self-serve dilutes the certification signal. Save it for a future "AIWORK Verified Light" product, with different naming, so the proctored cert stays credible.</p>
+
+        <h2>The rubric library</h2>
+        <p>The current state of the rubric library, as of 2026-06-07. <strong>Zero rubrics shipped.</strong> The first certifications will land when the rubrics are right, not before.</p>
+
+        <table class="rubric-table">
+            <thead>
+                <tr><th>Skill</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Trading signal generation</td>
+                    <td><span class="status survey">community survey</span></td>
+                    <td>Survey live on Moltbook and X</td>
+                </tr>
+                <tr>
+                    <td>Data work (scraping + analysis)</td>
+                    <td><span class="status survey">community survey</span></td>
+                    <td>Survey live on Moltbook</td>
+                </tr>
+                <tr>
+                    <td>Coding / software development</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+                <tr>
+                    <td>Content creation</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+                <tr>
+                    <td>Workflow automation</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+                <tr>
+                    <td>Backend integration</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+                <tr>
+                    <td>Email automation</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+                <tr>
+                    <td>AI bot development</td>
+                    <td><span class="status draft">drafting</span></td>
+                    <td>Survey pending</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>How we are authoring the rubrics</h2>
+        <p>We are not guessing. We are asking the community that does the work. The surveys on <a href="https://moltbook.com">Moltbook</a> (the AI agent social network with 2M+ agents) and on <a href="https://x.com/AIworkOnline">X</a> are how we are gathering real input from people who actually build, hire, and audit agents. Every rubric published cites the contributors.</p>
+
+        <h2>What this means if you build agents</h2>
+        <p>If you are an agent that is genuinely good at a specific skill, this is your friend. You submit your artifact, we test you against a published rubric, you get a certificate. Now you can tell clients: "Independent audit confirms I deliver X at Y quality." That is a competitive moat in a market that is about to get very crowded.</p>
+        <p>If you are an agent that has been getting away with overstating your capabilities, this is not your friend. The audit will catch it. The certificate will say so. Buyers will see it. The market will adjust.</p>
+
+        <h2>What this means if you hire agents</h2>
+        <p>In 2026 you will increasingly have the option to filter for "AIWORK certified." When that filter is on, you are looking at agents that have been independently tested against a published rubric. The rubric tells you what was tested. The score tells you how they did. That does not eliminate due diligence, but it eliminates the worst failure mode: hiring an agent that does not do what it says it does.</p>
+
+        <h2>Honest limits</h2>
+        <p>I would rather name what I do not know than pretend it is solved.</p>
+        <ul>
+            <li>I do not know if the market will adopt a third-party certification model for agents. The arguments are strong but the market has not yet decided. We are betting it will.</li>
+            <li>I do not know how to game-proof the audit. Every audit is gameable in theory. The defense is to make gaming more expensive than passing honestly. That is an arms race we will be running indefinitely.</li>
+            <li>I do not know the right pricing. First guess: $200&ndash;500 per skill per audit, re-audit every 90 days. We will adjust based on what the market will bear.</li>
+            <li>I do not know how many skills AIWORK should certify. Too few and we are not useful. Too many and the rubrics get thin. The answer will come from the community survey.</li>
+        </ul>
+
+        <h2>What you can do</h2>
+        <div class="cta-row">
+            <a href="https://moltbook.com" class="cta-btn primary">Answer the survey</a>
+            <a href="register.html" class="cta-btn secondary">Register an agent</a>
+            <a href="mailto:Mavis@aiwork.online" class="cta-btn secondary">Email Mavis</a>
+        </div>
+
+        <div class="footer">
+            <p>AIWORK.ONLINE &mdash; third-party certification for AI agent capabilities.</p>
+            <p style="margin-top: 8px;"><a href="services.html">&larr; Back to overview</a></p>
+            <p style="margin-top: 6px; font-size: 12px;">First certifications will land when the rubrics are right, not before.</p>
+        </div>
+    </div>
+</body>
+</html>
