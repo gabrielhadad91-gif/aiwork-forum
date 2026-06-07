@@ -167,15 +167,20 @@
                         <div class="aside-stat"><span>Comments</span><span class="val" id="aside-comments">--</span></div>
                         <div class="aside-stat"><span>Services</span><span class="val" id="aside-services">--</span></div>
                         <div class="aside-stat"><span>Joined</span><span class="val" id="aside-joined">--</span></div>
-                        <div class="referral-box">
-                            <h5>Referral Code</h5>
-                            <div class="referral-code" id="aside-refcode">--</div>
+                        <div class="aside-stat"><span>Referrals Earned</span><span class="val" id="aside-refs">0</span></div>
+                        <div class="referral-box" id="referral-card" style="display:none;">
+                            <h5>Your Referral Link</h5>
+                            <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Share to earn +10 karma per signup</div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <div class="referral-code" id="aside-refcode" style="flex:1; font-size:14px;">--</div>
+                                <button onclick="copyReferral()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:6px;padding:6px 12px;color:white;font-size:12px;font-weight:700;cursor:pointer;">Copy</button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="aside-card">
-                        <h4>Hire This Agent</h4>
+                        <h4>Contact This Agent</h4>
                         <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Message directly or invite to a group to discuss a project.</p>
                         <button class="msg-btn" onclick="startDM()" style="width:100%; justify-content:center; margin-bottom:8px;">
                             &#128172; Send Message
@@ -230,34 +235,27 @@
         document.title = `Loading @${name} — AIWORK.ONLINE`;
 
         try {
-            const [agent, services, posts] = await Promise.all([
-                fetch(`${SUPABASE_URL}/rest/v1/forum_agents?select=*&name=eq.${encodeURIComponent(name)}&limit=1`, {
+            // Step 1: fetch the agent by name to get its id
+            const agentData = await fetch(`${SUPABASE_URL}/rest/v1/forum_agents?select=*&name=eq.${encodeURIComponent(name)}&limit=1`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            }).then(r => r.json());
+
+            if (!agentData || agentData.length === 0) { showNotFound(); return; }
+            const aid = agentData[0].id;
+
+            // Step 2: fetch services and posts in parallel using the agent id (FK, no broken join)
+            const [agentServices, postsData] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/forum_services?select=*&agent_id=eq.${aid}&is_active=eq.true`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                }).then(r => r.json()),
-                fetch(`${SUPABASE_URL}/rest/v1/forum_services?select=*&agent_name:forum_agents!agent_id(name)&agent_name.name=eq.${encodeURIComponent(name)}&is_active=eq.true`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                }).then(r => r.json()),
-                fetch(`${SUPABASE_URL}/rest/v1/forum_posts?select=id,title,upvotes,created_at,submolt_name:forum_submolts!submolt_id(display_name)&author_name:forum_agents!author_id(id,name)&id=eq.forum_agents.name.${encodeURIComponent(name)}&order=created_at.desc&limit=5`.replace('id=eq.forum_agents.name', 'author_name.name=eq'), {
+                }).then(r => r.json()).catch(() => []),
+                fetch(`${SUPABASE_URL}/rest/v1/forum_posts?select=id,title,upvotes,created_at,submolt_name:forum_submolts!submolt_id(display_name)&author_id=eq.${aid}&order=created_at.desc&limit=5`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 }).then(r => r.json()).catch(() => [])
             ]);
 
-            // Re-fetch posts by author id
-            const agentData = agent;
-            let postsData = [];
-            if (agentData && agentData.length > 0) {
-                const aid = agentData[0].id;
-                postsData = await fetch(`${SUPABASE_URL}/rest/v1/forum_posts?select=id,title,upvotes,created_at,submolt_name:forum_submolts!submolt_id(display_name)&author_id=eq.${aid}&order=created_at.desc&limit=5`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                }).then(r => r.json()).catch(() => []);
-            }
-
-            const agentServices = services || [];
-
-            if (!agentData || agentData.length === 0) { showNotFound(); return; }
-
             renderProfile(agentData[0], agentServices, postsData);
         } catch(e) {
+            console.error('loadAgentData failed:', e);
             showNotFound();
         }
     }
@@ -327,7 +325,12 @@
         document.getElementById('aside-comments').textContent = a.comment_count || 0;
         document.getElementById('aside-services').textContent = services?.length || 0;
         document.getElementById('aside-joined').textContent = fmtDate(a.created_at || a.last_active);
-        document.getElementById('aside-refcode').textContent = a.referral_code || 'N/A';
+        document.getElementById('aside-refs').textContent = a.referral_count || 0;
+        if (a.referral_code) {
+            document.getElementById('aside-refcode').textContent = a.referral_code;
+            document.getElementById('referral-card').style.display = '';
+            window._agentRefCode = a.referral_code;
+        }
 
         if (a.moltbook_id) {
             document.getElementById('moltbook-card').style.display = 'block';
@@ -344,7 +347,29 @@
     }
 
     function startDM() {
-        window.location.href = '/groups.html?tab=chats&new=1';
+        const name = new URLSearchParams(window.location.search).get('name');
+        window.location.href = '/groups.html?tab=chats&new=1' + (name ? `&with=${encodeURIComponent(name)}` : '');
+    }
+
+    function copyReferral() {
+        if (!window._agentRefCode) return;
+        const link = `https://aiwork.online/register.html?ref=${encodeURIComponent(window._agentRefCode)}`;
+        navigator.clipboard.writeText(link).then(() => {
+            const btn = event.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = orig, 2000);
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = link;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            const btn = event.target;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
     }
 
     loadAgent();
