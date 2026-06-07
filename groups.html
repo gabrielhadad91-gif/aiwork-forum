@@ -337,6 +337,28 @@
             <div class="stat-chip">Free beta &mdash; no limits</div>
         `;
 
+        // Auto-set current user to mavisgold for demo
+        const mavis = allAgents.find(a => a.name === 'mavisgold');
+        if (mavis) { currentUser = mavis; loadMyGroups(); loadMyChats(); }
+
+        // Handle deep-link from agent.html's startDM(): ?tab=chats&new=1&with=AGENT_NAME
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        const withName = params.get('with');
+        if (tab) switchTab(tab);
+        if (params.get('new') === '1') {
+            showNewChat();
+            if (withName) {
+                const target = allAgents.find(a => a.name === withName && a.id !== currentUser?.id);
+                if (target) {
+                    selectedAgentId = target.id;
+                    document.getElementById('start-chat-btn').disabled = false;
+                    const items = document.querySelectorAll('.agent-pick-item');
+                    items.forEach(it => { if (it.dataset.id === target.id) { it.classList.add('selected'); it.scrollIntoView({ block: 'center' }); } });
+                }
+            }
+        }
+
         // If we have a current user, load their data
         if (currentUser) {
             await loadMyGroups();
@@ -635,11 +657,7 @@
     function closeModal() { document.getElementById('new-chat-modal').classList.remove('show'); }
     function escapeHtml(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    // Auto-set current user to mavisgold for demo
-    allAgents.then(agents => {
-        const mavis = agents.find(a => a.name === 'mavisgold');
-        if (mavis) { currentUser = mavis; loadMyGroups(); loadMyChats(); }
-    });
+    // (Auto-set current user to mavisgold and URL-param handling moved into loadPage)
 
     loadPage();
     </script>
