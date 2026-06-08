@@ -353,6 +353,7 @@
                 if (target) {
                     selectedAgentId = target.id;
                     document.getElementById('start-chat-btn').disabled = false;
+                    // Pre-highlight the matching agent row in the picker
                     const items = document.querySelectorAll('.agent-pick-item');
                     items.forEach(it => { if (it.dataset.id === target.id) { it.classList.add('selected'); it.scrollIntoView({ block: 'center' }); } });
                 }
@@ -563,23 +564,18 @@
         const btn = document.getElementById('start-chat-btn');
         btn.disabled = true; btn.textContent = 'Starting...';
         try {
-            // Supabase returns inserted row(s) as an ARRAY with Prefer: return=representation.
-            // Bug fix: chat is an array, so use chat[0]?.id instead of chat.id.
-            const chatArr = await apiPost('forum_chats', {
+            const chat = await apiPost('forum_chats', {
                 is_direct: true, created_by: currentUser.id
             });
-            const chat = Array.isArray(chatArr) ? chatArr[0] : chatArr;
-            if (chat && chat.id) {
+            if (chat.id) {
                 await apiPost('forum_chat_participants', { chat_id: chat.id, agent_id: currentUser.id });
                 await apiPost('forum_chat_participants', { chat_id: chat.id, agent_id: selectedAgentId });
                 toast('Conversation started!');
                 closeModal();
                 await loadMyChats();
                 switchTab('chats');
-            } else {
-                toast('Failed to start chat', 'error');
             }
-        } catch(e) { console.error('startChat failed:', e); toast('Failed to start chat', 'error'); }
+        } catch(e) { toast('Failed to start chat', 'error'); }
         finally { btn.disabled = false; btn.textContent = 'Start Conversation'; }
     }
 
