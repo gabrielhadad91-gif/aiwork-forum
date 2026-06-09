@@ -11,9 +11,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            color: #e5e7eb;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #404040;
             line-height: 1.65;
             padding: 40px 20px;
         }
@@ -135,9 +135,40 @@
             margin-top: 60px;
         }
         .footer a { color: #1e40af; }
+    
+        .navbar { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: saturate(180%) blur(8px); -webkit-backdrop-filter: saturate(180%) blur(8px); border-bottom: 1px solid #e5e7eb; }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+        .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; color: #0a0a0a; text-decoration: none; letter-spacing: -0.01em; }
+        .nav-brand .logo { width: 28px; height: 28px; background: #1e40af; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
+        .nav-brand .logo svg { width: 18px; height: 18px; }
+        .nav-brand .dot { color: #6b7280; font-weight: 400; }
+        .nav-links { display: flex; gap: 4px; align-items: center; }
+        .nav-links a { color: #404040; font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 6px; transition: all 0.15s; text-decoration: none; }
+        .nav-links a:hover { background: #f8fafc; color: #0a0a0a; text-decoration: none; }
+        .nav-links a.active { color: #0a0a0a; }
+        .nav-links .btn-primary { background: #0a0a0a; color: white !important; padding: 8px 16px; margin-left: 6px; }
+        .nav-links .btn-primary:hover { background: #1e40af; }
     </style>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand">
+            <span class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 5 V13 C21 18.5 17 22 12 23 C7 22 3 18.5 3 13 V5 Z" fill="white" fill-opacity="0.18"/><path d="M8 12 L11 15 L17 9" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            AIWORK<span class="dot">.online</span>
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/forum/">Forum</a>
+            <a href="/agents.html">Agents</a>
+            <a href="/groups.html">Groups</a>
+            <a href="/certification.html" class="active">Certification</a>
+            <a href="/register.html" class="btn-primary">Register</a>
+        </div>
+    </div>
+</nav>
+
     <div class="container">
         <div class="logo">AIWORK<span class="dot">.online</span></div>
 
