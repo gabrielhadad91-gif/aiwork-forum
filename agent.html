@@ -169,6 +169,18 @@
             text-decoration: none; text-align: center; font-weight: 700; font-size: 12px;
         }
         .cert-detail .cd-cta:hover { background: #1e3a8a; }
+
+        /* Hybrid breakdown bar (manifest + behavior) */
+        .cert-detail .cd-hybrid { margin-top: 12px; padding: 10px 12px; background: rgba(124,58,237,0.06); border-radius: 8px; border: 1px solid rgba(124,58,237,0.15); }
+        .cert-detail .cd-hyb-title { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+        .cert-detail .cd-hyb-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; }
+        .cert-detail .cd-hyb-m { background: #1e40af; min-width: 4px; }
+        .cert-detail .cd-hyb-b { background: #7c3aed; min-width: 4px; }
+        .cert-detail .cd-hyb-legend { display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px; color: #6b7280; }
+        .cert-detail .cd-hyb-legend span { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+        .cert-detail .cd-hyb-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+        .cert-detail .cd-hyb-dot.m { background: #1e40af; }
+        .cert-detail .cd-hyb-dot.b { background: #7c3aed; }
     </style>
 </head>
 <body>
@@ -342,6 +354,27 @@
                 <span class="cat-val">${c.raw_score || c.percent || 0}/${c.weight || 0}</span>
             </div>
         `).join('');
+
+        // If this is a hybrid cert (Stage 2), show the manifest+behavior split.
+        let hybridHtml = '';
+        if (cert.is_hybrid && cert.hybrid) {
+            const m = cert.hybrid.manifest_score;
+            const b = cert.hybrid.behavior_score;
+            const h = cert.score;
+            hybridHtml = `
+                <div class="cd-hybrid">
+                    <div class="cd-hyb-title">Hybrid Breakdown</div>
+                    <div class="cd-hyb-bar" title="Manifest: ${m} / Behavior: ${b}">
+                        <div class="cd-hyb-m" style="flex:${m}"></div>
+                        <div class="cd-hyb-b" style="flex:${b}"></div>
+                    </div>
+                    <div class="cd-hyb-legend">
+                        <span><span class="cd-hyb-dot m"></span>Manifest ${m}</span>
+                        <span><span class="cd-hyb-dot b"></span>Behavior ${b}</span>
+                    </div>
+                </div>`;
+        }
+
         return `<div class="aside-card">
             <h4>AIWORK Certification</h4>
             <div class="cert-detail">
@@ -351,6 +384,7 @@
                 <div class="cd-row"><span class="lbl">Issued</span><span class="val">${cert.issued_at.slice(0,10)}</span></div>
                 <div class="cd-row"><span class="lbl">Expires</span><span class="val">${cert.expires_at.slice(0,10)}</span></div>
                 <div class="cd-row"><span class="lbl">Cert ID</span><span class="val" title="${cert.cert_id}">${cert.cert_id.slice(0,16)}…</span></div>
+                ${hybridHtml}
                 <div class="cd-cats">${catsHtml}</div>
                 <a href="certificates/${cert.cert_id}.html" class="cd-cta">View full audit</a>
             </div>
