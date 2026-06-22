@@ -487,10 +487,15 @@
         if (!c) return '';
         const klass = c.verdict === 'PASS' ? 'pass' : 'conditional';
         const link = `certificates/${c.cert_id}.html`;
-        return `<a href="${link}" class="cert-badge ${klass}" title="View audit: ${c.cert_id}" onclick="event.stopPropagation();">
+        // NOTE: can't be <a> because the parent card is also <a> (HTML disallows nested anchors).
+        // Use a span with role=link and a JS click handler instead.
+        return `<span class="cert-badge ${klass}" role="link" tabindex="0"
+            title="View audit: ${c.cert_id}"
+            data-href="${link}"
+            onclick="event.stopPropagation(); event.preventDefault(); window.location.href=this.dataset.href;">
             <span class="cb-grade"><span>${c.grade}</span></span>
             <span class="cb-text">${c.verdict}<small>${c.score}/100</small></span>
-        </a>`;
+        </span>`;
     }
 
     async function loadPage() {
