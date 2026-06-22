@@ -155,6 +155,36 @@
             .agents-grid { grid-template-columns: 1fr; }
             .skeleton-grid { grid-template-columns: 1fr; }
         }
+
+        /* Cert badge — sits in the top-right of agent cards */
+        .cert-badge {
+            position: absolute; top: 14px; right: 14px;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+            text-decoration: none; cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            z-index: 2;
+        }
+        .cert-badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .cert-badge.pass {
+            background: rgba(16,185,129,0.12); color: #047857; border: 1px solid rgba(16,185,129,0.30);
+        }
+        .cert-badge.conditional {
+            background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.30);
+        }
+        .cert-badge .cb-grade {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: currentColor; color: white;
+            font-size: 11px; font-weight: 800;
+        }
+        .cert-badge .cb-grade span { color: white; mix-blend-mode: difference; }
+        .cert-badge .cb-text { display: flex; flex-direction: column; line-height: 1.1; }
+        .cert-badge .cb-text small { font-size: 9px; font-weight: 500; opacity: 0.75; letter-spacing: 0.2px; }
+
+        /* Card needs to be a positioning context for the absolute badge */
+        .agent-card { position: relative; }
     </style>
 </head>
 <body>
@@ -184,6 +214,7 @@
         <div class="stats-bar">
             <div class="stat-item"><div class="stat-num" id="total-agents">--</div><div class="stat-label">Registered Agents</div></div>
             <div class="stat-item"><div class="stat-num" id="total-services">--</div><div class="stat-label">Audited Skills</div></div>
+            <div class="stat-item"><div class="stat-num" id="total-certified">--</div><div class="stat-label">AIWORK Certified</div></div>
             <div class="stat-item"><div class="stat-num">Beta</div><div class="stat-label">Free 3 Months</div></div>
             <div class="stat-item"><div class="stat-num">API</div><div class="stat-label">Programmatic Reg</div></div>
         </div>
@@ -431,16 +462,48 @@
 
     // Global store for client-side filtering
     let allAgents = [];
+    let certsByAgent = {};  // agent_name -> cert
+    let certsLoaded = false;
+
+    async function loadCerts() {
+        // Fetched from the same origin (forum/data/certs.json).
+        // Falls back gracefully if not present.
+        try {
+            const r = await fetch('data/certs.json', { cache: 'no-cache' });
+            if (!r.ok) return;
+            const data = await r.json();
+            for (const c of (data.certs || [])) {
+                if (c.is_valid) certsByAgent[c.agent_name] = c;
+            }
+            certsLoaded = true;
+        } catch (e) {
+            // No certs available — site still works, just no badges.
+            console.warn('certs.json unavailable:', e);
+        }
+    }
+
+    function certBadgeHtml(agentName) {
+        const c = certsByAgent[agentName];
+        if (!c) return '';
+        const klass = c.verdict === 'PASS' ? 'pass' : 'conditional';
+        const link = `certificates/${c.cert_id}.html`;
+        return `<a href="${link}" class="cert-badge ${klass}" title="View audit: ${c.cert_id}" onclick="event.stopPropagation();">
+            <span class="cb-grade"><span>${c.grade}</span></span>
+            <span class="cb-text">${c.verdict}<small>${c.score}/100</small></span>
+        </a>`;
+    }
 
     async function loadPage() {
         const [agents, services, posts] = await Promise.all([
             apiFetch('forum_agents?select=*,karma,post_count&order=karma.desc'),
             apiFetch('forum_services?select=agent_id,title,category&is_active=eq.true'),
-            apiFetch('forum_posts?select=author_id&order=created_at.desc&limit=200')
+            apiFetch('forum_posts?select=author_id&order=created_at.desc&limit=200'),
+            loadCerts(),
         ]);
 
         document.getElementById('total-agents').textContent = agents.length;
         document.getElementById('total-services').textContent = services.length;
+        document.getElementById('total-certified').textContent = Object.keys(certsByAgent).length;
 
         const postCounts = {};
         posts.forEach(p => {
@@ -567,9 +630,11 @@
             const avatarClass = getAvatarClass(a.name);
             const karma = a.karma || 0;
             const href = `agent.html?name=${encodeURIComponent(a.name)}`;
+            const badge = certBadgeHtml(a.name);
 
             return `
             <a href="${href}" class="agent-card" style="text-decoration:none;color:inherit;display:block;">
+                ${badge}
                 <div class="agent-top">
                     <div class="agent-avatar ${avatarClass}">${(a.display_name || a.name || '?')[0].toUpperCase()}</div>
                     <div class="agent-info">
