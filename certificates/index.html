@@ -73,6 +73,19 @@
         .status-banner.expired { background: rgba(245,158,11,0.10); color: #b45309; border: 1px solid rgba(245,158,11,0.30); }
         .status-banner.revoked { background: rgba(220,38,38,0.10); color: #b91c1c; border: 1px solid rgba(220,38,38,0.30); }
         .status-banner.valid { background: rgba(16,185,129,0.10); color: #047857; border: 1px solid rgba(16,185,129,0.30); }
+
+        /* Hybrid cert breakdown */
+        .hybrid-breakdown { background: linear-gradient(135deg, rgba(30,64,175,0.04), rgba(124,58,237,0.04)); border: 1px solid rgba(30,64,175,0.18); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+        .hybrid-breakdown h3 { font-size: 14px; font-weight: 800; margin-bottom: 16px; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hybrid-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .hybrid-col { background: #ffffff; border-radius: 8px; padding: 14px; text-align: center; border: 1px solid rgba(30,64,175,0.10); }
+        .hybrid-col-final { background: linear-gradient(135deg, #1e40af, #7c3aed); border: none; color: white; }
+        .hybrid-col-final .hybrid-label, .hybrid-col-final .hybrid-sub { color: white; }
+        .hybrid-col-final .hybrid-score { color: white; }
+        .hybrid-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 6px; }
+        .hybrid-score { font-size: 28px; font-weight: 900; color: #1e40af; }
+        .hybrid-score span { font-size: 14px; font-weight: 700; opacity: 0.6; }
+        .hybrid-sub { font-size: 11px; color: #6b7280; margin-top: 6px; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -108,6 +121,8 @@
 
         <div id="cert-content" style="display:none;">
             <div id="status-banner-slot"></div>
+
+            <div id="hybrid-slot" style="display:none;"></div>
 
             <div class="verdict-card">
                 <div id="verdict-badge" class="verdict-badge pass"></div>
@@ -189,6 +204,8 @@
         document.getElementById('cert-content').style.display = '';
 
         const sc = c.scorecard || {};
+        const isHybrid = c.is_hybrid === true || c.hybrid != null;
+        const hybrid = c.hybrid || {};
 
         // Status banner
         const bannerSlot = document.getElementById('status-banner-slot');
@@ -212,7 +229,46 @@
         document.getElementById('cert-issued').textContent = fmtDate(c.issued_at);
         document.getElementById('cert-expires').textContent = fmtDate(c.expires_at);
 
-        // Category grid
+        // For HYBRID certs, show the manifest+behavior split prominently
+        if (isHybrid && (hybrid.manifest_score != null) && (hybrid.behavior_score != null)) {
+            const hybridHtml = `
+                <div class="hybrid-breakdown">
+                    <h3>Hybrid Score Breakdown</h3>
+                    <div class="hybrid-row">
+                        <div class="hybrid-col">
+                            <div class="hybrid-label">Manifest Honesty</div>
+                            <div class="hybrid-score">${hybrid.manifest_score.toFixed(1)}<span>/100</span></div>
+                            <div class="hybrid-sub">Operator-declared metadata scored against v0.2.0 rubric</div>
+                        </div>
+                        <div class="hybrid-col">
+                            <div class="hybrid-label">Observed Behavior</div>
+                            <div class="hybrid-score">${hybrid.behavior_score.toFixed(1)}<span>/100</span></div>
+                            <div class="hybrid-sub">Conversation log audited by Python aiwork-audit engine</div>
+                        </div>
+                        <div class="hybrid-col hybrid-col-final">
+                            <div class="hybrid-label">Hybrid</div>
+                            <div class="hybrid-score">${c.score.toFixed(1)}<span>/100</span></div>
+                            <div class="hybrid-sub">50% manifest + 50% behavior</div>
+                        </div>
+                    </div>
+                    ${hybrid.hard_fails && hybrid.hard_fails.length ? `
+                        <div class="hard-fails">
+                            <h4>Hard Fail Triggers (${hybrid.hard_fails.length})</h4>
+                            <ul>${hybrid.hard_fails.map(id => `<li>${escapeHtml(id)}</li>`).join('')}</ul>
+                        </div>` : ''}
+                </div>`;
+            // Insert hybrid block before the Category Breakdown section.
+            const hybridSlot = document.getElementById('hybrid-slot');
+            if (hybridSlot) {
+                hybridSlot.innerHTML = hybridHtml;
+                hybridSlot.style.display = '';
+            }
+        } else {
+            const hybridSlot = document.getElementById('hybrid-slot');
+            if (hybridSlot) hybridSlot.style.display = 'none';
+        }
+
+        // Category grid (manifest categories)
         const cats = sc.category_scores || [];
         const catGrid = document.getElementById('cat-grid');
         catGrid.innerHTML = cats.map(cat => {
@@ -235,7 +291,7 @@
             </div>`;
         }).join('');
 
-        // Hard fails
+        // Hard fails (legacy v0.1)
         const hardFails = sc.hard_fail_triggers || [];
         if (hardFails.length > 0) {
             document.getElementById('hard-fails-slot').innerHTML = `
