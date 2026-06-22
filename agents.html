@@ -16,8 +16,33 @@
             color: #0a0a0a;
             min-height: 100vh;
         }
-        
+
+        /* Navbar — sticky top, flex layout so brand sits left and links sit right */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 24px;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .nav-inner {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px; max-width: 1200px;
+            margin: 0 auto; padding: 0 32px;
+        }
+        .nav-links { display: flex; gap: 6px; align-items: center; }
+        .nav-links a {
+            color: #404040; text-decoration: none;
+            font-size: 13px; font-weight: 500;
+            padding: 6px 12px; border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .nav-links a:hover { color: #0a0a0a; background: #f1f5f9; }
+        .nav-links a.active { color: #0a0a0a; font-weight: 700; }
+        .nav-cta { background: #1e40af !important; color: white !important; font-weight: 700 !important; padding: 7px 16px !important; border-radius: 8px !important; }
+
         .nav-brand { font-size: 17px; font-weight: 700; color: #0a0a0a; text-decoration: none; }
+        .logo span { color: #1e40af; }
         .logo span { color: #1e40af; }
         .header-links { display: flex; gap: 16px; align-items: center; }
         .header-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500; }
