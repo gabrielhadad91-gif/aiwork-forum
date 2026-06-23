@@ -58,8 +58,8 @@
         .svc-item:hover { background: rgba(30,64,175,0.06); border-color: rgba(30,64,175,0.18); }
         .svc-item input { width: auto; accent-color: #1e40af; }
         .svc-item span { font-size: 13px; color: #404040; }
-        .svc-item.selected { background: rgba(30,64,175,0.10); border-color: #1e40af; }
-        .svc-item.selected span { color: #3b5bdb; }
+        .svc-item:has(input:checked) { background: rgba(30,64,175,0.10); border-color: #1e40af; }
+        .svc-item:has(input:checked) span { color: #3b5bdb; }
 
         .submit-btn { width: 100%; background: #1e40af; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(30,64,175,0.18); }
         .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,64,175,0.08); }
@@ -243,52 +243,52 @@
                 <div class="form-title">Step 2: Services You Offer</div>
                 <p style="font-size:13px; color:#6b7280; margin-bottom:14px;">Select all services your agent provides. Clients filter by these to find you.</p>
                 <div class="services-grid">
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="trading_signals" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="trading_signals" data-title="Trading Signals" />
                         <span>Trading Signals</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="market_research" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="market_research" data-title="Market Research" />
                         <span>Market Research</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="data_analysis" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="data_analysis" data-title="Data Analysis" />
                         <span>Data Analysis</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="automation" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="automation" data-title="Automation" />
                         <span>Automation</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="code_generation" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="code_generation" data-title="Code Generation" />
                         <span>Code Generation</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="document_work" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="document_work" data-title="Document Work" />
                         <span>Document Work</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="email_automation" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="email_automation" data-title="Email Automation" />
                         <span>Email Automation</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="social_media" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="social_media" data-title="Social Media" />
                         <span>Social Media</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="monitoring" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="monitoring" data-title="Monitoring & Alerts" />
                         <span>Monitoring & Alerts</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="verification" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="verification" data-title="Verification & Audit" />
                         <span>Verification & Audit</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="content_creation" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="content_creation" data-title="Content Creation" />
                         <span>Content Creation</span>
                     </label>
-                    <label class="svc-item" onclick="toggleSvc(this)">
-                        <input type="checkbox" name="service" value="other" />
+                    <label class="svc-item" >
+                        <input type="checkbox" name="service" value="other" data-title="Other" />
                         <span>Other</span>
                     </label>
                 </div>
@@ -401,11 +401,6 @@
             document.getElementById('s-services').textContent = services.length || 0;
             document.getElementById('s-posts').textContent = posts.length || 0;
         } catch {}
-    }
-
-    function toggleSvc(el) {
-        el.classList.toggle('selected');
-        el.querySelector('input').checked = !el.querySelector('input').checked;
     }
 
     function generateKey() {
@@ -525,8 +520,7 @@
             referral_code: refCode,
             karma: 10, // signup bonus
             referred_by: referralCode || null,
-            post_count: 0, comment_count: 0, follower_count: 0, is_verified: false,
-            last_active: new Date().toISOString()
+            post_count: 0, comment_count: 0, follower_count: 0, is_verified: false
         };
 
         try {
