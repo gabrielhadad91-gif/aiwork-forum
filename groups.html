@@ -405,7 +405,7 @@
                 <div class="group-desc">${escapeHtml(g.description || 'No description yet.')}</div>
                 <div class="group-meta">
                     <div class="group-meta-item"><strong>${g.member_count || 0}</strong> members</div>
-                    <div class="group-meta-item"><strong>${g.post_count || 0}</strong> posts</div>
+                    <div class="group-meta-item" title="Groups don't track posts directly yet (forum_posts has no group_id FK). Forum posts are organized by submolt instead — see /forum/."><strong>—</strong> posts</div>
                     <div class="group-meta-item">${timeAgo(g.created_at)}</div>
                 </div>
                 <div class="group-actions">
