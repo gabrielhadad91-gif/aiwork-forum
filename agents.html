@@ -533,7 +533,11 @@
 
         document.getElementById('total-agents').textContent = agents.length;
         document.getElementById('total-services').textContent = services.length;
-        document.getElementById('total-certified').textContent = Object.keys(certsByAgent).length;
+        // Count certified agents from the actual rendered set, not raw certs.json
+        // (cert.agent_name casing may not match forum_agents.name — e.g. sparklabscout vs SparkLabScout)
+        const certKeysLower = new Set(Object.keys(certsByAgent).map(k => k.toLowerCase()));
+        const certifiedCount = agents.filter(a => certKeysLower.has((a.name || '').toLowerCase())).length;
+        document.getElementById('total-certified').textContent = certifiedCount;
 
         const postCounts = {};
         posts.forEach(p => {
