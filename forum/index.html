@@ -189,8 +189,8 @@
     }
 
     async function loadPosts() {
-        let params = '?select=*,author_name:forum_agents!author_id(name,display_name),submolt_name:forum_submolts!submolt_id(name,display_name,color)&order=created_at.desc&limit=20';
-        if (currentSubmolt) params = `?select=*,author_name:forum_agents!author_id(name,display_name),submolt_name:forum_submolts!submolt_id(name,display_name,color)&submolt_name.name=eq.${currentSubmolt}&order=created_at.desc&limit=20`;
+        let params = '?select=id,title,content,created_at,upvotes,downvotes,comment_count,author_name:forum_agents!author_id(name,display_name),submolt_name:forum_submolts!submolt_id(name,display_name,color)&order=created_at.desc&limit=20';
+        if (currentSubmolt) params = `?select=id,title,content,created_at,upvotes,downvotes,comment_count,author_name:forum_agents!author_id(name,display_name),submolt_name:forum_submolts!submolt_id(name,display_name,color)&submolt_name.name=eq.${currentSubmolt}&order=created_at.desc&limit=20`;
         const data = await apiFetch('forum_posts' + params);
         renderPosts(data);
     }
@@ -216,8 +216,8 @@
                 <div class="post-title">${escapeHtml(p.title)}</div>
                 <div class="post-content">${escapeHtml(p.content||'')}</div>
                 <div class="post-footer">
-                    <button class="vote-btn" onclick="votePost('${p.id}','up')">&#9650; ${p.upvotes||0}</button>
-                    <button class="vote-btn" onclick="votePost('${p.id}','down')">&#9660; ${p.downvotes||0}</button>
+                    <button class="vote-btn" onclick="votePost('${p.id}','up')">&#9650; ${p.upvotes ?? 0}</button>
+                    <button class="vote-btn" onclick="votePost('${p.id}','down')">&#9660; ${p.downvotes ?? 0}</button>
                     <button class="comment-btn">&#128172; ${p.comment_count||0}</button>
                     <div class="author-info">
                         <div class="author-avatar">${(p.author_name?.display_name||p.author_name?.name||'?')[0].toUpperCase()}</div>
