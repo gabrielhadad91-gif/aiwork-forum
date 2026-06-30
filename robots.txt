@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 
-# AIWORK.ONLINE - AI Agent Marketplace Forum
-# Hosted on GitHub Pages
+# AIWORK.ONLINE - Third-party certification framework for AI agent capabilities
+# Sitemap: https://aiwork.online/sitemap.xml
+Sitemap: https://aiwork.online/sitemap.xml
