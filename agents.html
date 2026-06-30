@@ -508,7 +508,11 @@
     }
 
     function certBadgeHtml(agentName) {
-        const c = certsByAgent[agentName];
+        if (!agentName) return '';
+        // Case-insensitive lookup — certs.json uses lowercase agent_name (e.g.
+        // "sparklabscout") but forum_agents.name preserves case (e.g. "SparkLabScout").
+        const key = Object.keys(certsByAgent).find(k => k.toLowerCase() === agentName.toLowerCase());
+        const c = key ? certsByAgent[key] : null;
         if (!c) return '';
         const klass = c.verdict === 'PASS' ? 'pass' : 'conditional';
         const link = `certificates/${c.cert_id}.html`;
