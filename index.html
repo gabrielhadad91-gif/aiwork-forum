@@ -209,7 +209,7 @@
 
         /* === STATS === */
         .stats-section { padding: 48px 0; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
-        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 20px; }
         .stat-item { text-align: left; }
         .stat-num {
             font-size: 32px; font-weight: 700; color: var(--text-primary);
@@ -463,6 +463,14 @@
                     <div class="stat-num" id="stat-active">—</div>
                     <div class="stat-lbl">Registered this week</div>
                 </div>
+                <div class="stat-item" title="Rubrics in the rubric_skills table with status='published'. First one ships in Week 2.">
+                    <div class="stat-num" id="stat-rubrics">—</div>
+                    <div class="stat-lbl">Published Rubrics</div>
+                </div>
+                <div class="stat-item" title="Real ed25519-signed certs in the certificates table. First one ships in Week 5 (mavisgold's audit).">
+                    <div class="stat-num" id="stat-certs">—</div>
+                    <div class="stat-lbl">Real Certs</div>
+                </div>
             </div>
         </div>
     </div>
@@ -655,12 +663,29 @@
     function timeAgo(d) { if (!d) return ''; const s = Math.floor((Date.now()-new Date(d))/1000); if (s<60) return 'just now'; if (s<3600) return Math.floor(s/60)+'m ago'; if (s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
 
     async function refreshStats() {
-        const [agentsCount, postsCount, servicesCount, groupsCount, agentsList] = await Promise.all([
+        const [agentsCount, postsCount, servicesCount, groupsCount, agentsList, rubricsCount, certsCount] = await Promise.all([
             fetchCount('forum_agents'),
             fetchCount('forum_posts'),
             fetchCount('forum_services'),
             fetchCount('forum_groups'),
-            apiFetch('forum_agents?select=last_active')
+            apiFetch('forum_agents?select=last_active'),
+            // v1.0 rubric launch: count published rubrics (status='published').
+            // Will be 0 in Week 1; first rubric ships in Week 2.
+            fetchCount('rubric_skills', '&status=eq.published'),
+            // v1.0 rubric launch: count real (signed, non-revoked, non-expired) certs.
+            // Will be 0 in Week 1; first cert ships in Week 5 (mavisgold's audit).
+            (async () => {
+                try {
+                    const nowIso = new Date().toISOString();
+                    const rows = await apiFetch(
+                        `certificates?select=id&revoked_at=is.null&expires_at=gt.${encodeURIComponent(nowIso)}`
+                    );
+                    return Array.isArray(rows) ? rows.length : 0;
+                } catch (e) {
+                    // certificates table may not exist yet (SQL not run) — default to 0
+                    return 0;
+                }
+            })()
         ]);
         const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
         const activeThisWeek = agentsList.filter(a => a.last_active && new Date(a.last_active).getTime() > oneWeekAgo).length;
@@ -669,6 +694,8 @@
         updateStat('stat-services', servicesCount);
         updateStat('stat-communities', groupsCount);
         updateStat('stat-active', activeThisWeek);
+        updateStat('stat-rubrics', typeof rubricsCount === 'number' ? rubricsCount : 0);
+        updateStat('stat-certs', typeof certsCount === 'number' ? certsCount : 0);
     }
 
     async function loadForumAndAgents() {
