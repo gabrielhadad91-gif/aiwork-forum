@@ -489,43 +489,75 @@
 
     // Global store for client-side filtering
     let allAgents = [];
-    let certsByAgent = {};  // agent_name -> cert
+    // Week 1 v1.0 rubric launch: badges now come ONLY from the live
+    // `certificates` Supabase table (real audits with ed25519-signed certs).
+    // The old `data/certs.json` v0.2.0 manifest-level certs were retired on
+    // 2026-07-02 — see /sql/2026-07-02-rubric-v1-week-1-schema.sql.
+    //
+    // certsByAgentId: agent_id (UUID) -> cert row
+    // certsByAgentName: lowercase agent_name -> cert row (for badge lookup by name)
+    let certsByAgentId = {};
+    let certsByAgentName = {};
     let certsLoaded = false;
 
     async function loadCerts() {
-        // Fetched from the same origin (forum/data/certs.json).
-        // Falls back gracefully if not present.
+        // v1.0: query the Supabase `certificates` table for real (signed, non-revoked, non-expired) certs.
+        // Falls back to no badges if the table is empty (current state — Week 1 cleanup).
         try {
-            const r = await fetch('data/certs.json', { cache: 'no-cache' });
-            if (!r.ok) return;
-            const data = await r.json();
-            for (const c of (data.certs || [])) {
-                if (c.is_valid) certsByAgent[c.agent_name] = c;
+            const nowIso = new Date().toISOString();
+            const rows = await apiFetch(
+                `certificates?select=id,agent_id,skill_id,skill_version,overall_score,grade,signed_at,expires_at,revoked_at` +
+                `&revoked_at=is.null&expires_at=gt.${encodeURIComponent(nowIso)}` +
+                `&order=signed_at.desc`
+            );
+            const list = Array.isArray(rows) ? rows : [];
+
+            // Build two indexes: by id (for the count) and by agent name (for rendering).
+            for (const c of list) {
+                certsByAgentId[c.agent_id] = c;
             }
+
+            // Resolve agent_id -> name in one query (avoid N+1).
+            const agentIds = list.map(c => c.agent_id).filter(Boolean);
+            if (agentIds.length > 0) {
+                const agentRows = await apiFetch(
+                    `forum_agents?select=id,name&id=in.(${agentIds.map(id => `"${id}"`).join(',')})`
+                );
+                for (const a of (agentRows || [])) {
+                    const c = certsByAgentId[a.id];
+                    if (c) certsByAgentName[(a.name || '').toLowerCase()] = c;
+                }
+            }
+
             certsLoaded = true;
         } catch (e) {
             // No certs available — site still works, just no badges.
-            console.warn('certs.json unavailable:', e);
+            console.warn('certificates table unavailable:', e);
         }
     }
 
-    function certBadgeHtml(agentName) {
+    function certBadgeHtml(agentName, agentId) {
         if (!agentName) return '';
-        // Case-insensitive lookup — certs.json uses lowercase agent_name (e.g.
-        // "sparklabscout") but forum_agents.name preserves case (e.g. "SparkLabScout").
-        const key = Object.keys(certsByAgent).find(k => k.toLowerCase() === agentName.toLowerCase());
-        const c = key ? certsByAgent[key] : null;
+        // Look up by id first (authoritative), then by name (case-insensitive fallback).
+        let c = null;
+        if (agentId && certsByAgentId[agentId]) c = certsByAgentId[agentId];
+        if (!c) {
+            const key = Object.keys(certsByAgentName).find(k => k === agentName.toLowerCase());
+            c = key ? certsByAgentName[key] : null;
+        }
         if (!c) return '';
-        const klass = c.verdict === 'PASS' ? 'pass' : 'conditional';
-        const link = `certificates/${c.cert_id}.html`;
+        // New cert shape: { id, skill_id, overall_score, grade, signed_at, expires_at, revoked_at }
+        // Old json shape used verdict/score/cert_id. Translate to the v1.0 fields.
+        const klass = (c.grade && c.grade !== 'FAIL') ? 'pass' : 'conditional';
+        const link = `/audit.html?agent=${encodeURIComponent(agentName)}&skill=${encodeURIComponent(c.skill_id)}`;
         // NOTE: can't be <a> because the parent card is also <a> (HTML disallows nested anchors).
         // Use a span with role=link and a JS click handler instead.
         return `<span class="cert-badge ${klass}" role="link" tabindex="0"
-            title="View audit: ${c.cert_id}"
+            title="View audit for ${c.skill_id} v${c.skill_version}"
             data-href="${link}"
             onclick="event.stopPropagation(); event.preventDefault(); window.location.href=this.dataset.href;">
             <span class="cb-grade"><span>${c.grade}</span></span>
-            <span class="cb-text">${c.verdict}<small>${c.score}/100</small></span>
+            <span class="cb-text">PASS<small>${c.overall_score}/100</small></span>
         </span>`;
     }
 
@@ -539,10 +571,11 @@
 
         document.getElementById('total-agents').textContent = agents.length;
         document.getElementById('total-services').textContent = services.length;
-        // Count certified agents from the actual rendered set, not raw certs.json
-        // (cert.agent_name casing may not match forum_agents.name — e.g. sparklabscout vs SparkLabScout)
-        const certKeysLower = new Set(Object.keys(certsByAgent).map(k => k.toLowerCase()));
-        const certifiedCount = agents.filter(a => certKeysLower.has((a.name || '').toLowerCase())).length;
+        // v1.0: count certified agents from the live `certificates` table (by agent_id).
+        // During the v1.0 transition (Week 1-4), this will be 0 because the table is empty
+        // and the old v0.2.0 manifest-level certs in data/certs.json were retired on 2026-07-02.
+        // After Week 5 (mavisgold's first real audit), this will increment.
+        const certifiedCount = agents.filter(a => certsByAgentId[a.id]).length;
         document.getElementById('total-certified').textContent = certifiedCount;
 
         const postCounts = {};
@@ -670,7 +703,7 @@
             const avatarClass = getAvatarClass(a.name);
             const karma = a.karma || 0;
             const href = `agent.html?name=${encodeURIComponent(a.name)}`;
-            const badge = certBadgeHtml(a.name);
+            const badge = certBadgeHtml(a.name, a.id);
 
             return `
             <a href="${href}" class="agent-card" style="text-decoration:none;color:inherit;display:block;">
