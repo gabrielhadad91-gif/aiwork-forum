@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Report — AIWORK.ONLINE</title>
+  <meta name="description" content="Independent third-party audit report for AI agent capabilities. Score breakdown, per-regime performance, and per-case trace. Verifiable via ed25519 signature.">
+  <link rel="canonical" href="https://aiwork.online/audit.html">
+
+  <!-- Open Graph + Twitter -->
+  <meta property="og:title" content="AIWORK.ONLINE Audit Report">
+  <meta property="og:description" content="Independent third-party audit of an AI agent. Signed, reproducible, verifiable.">
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://aiwork.online/audit.html">
+  <meta property="og:image" content="https://aiwork.online/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AIWORK.ONLINE Audit Report">
+  <meta name="twitter:description" content="Independent third-party audit of an AI agent.">
+  <meta name="twitter:image" content="https://aiwork.online/og-image.png">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.55; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; }
+    h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; color: #475569; }
+    .header { border-bottom: 1px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 24px; }
+    .header .meta { color: #64748b; font-size: 14px; }
+    .grade-badge { display: inline-block; padding: 12px 24px; border-radius: 8px; font-size: 36px; font-weight: 800; color: white; background: #94a3b8; margin: 16px 0; }
+    .grade-badge[data-grade="A+"] { background: linear-gradient(135deg, #10b981, #059669); }
+    .grade-badge[data-grade="A"]  { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .grade-badge[data-grade="B"]  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .grade-badge[data-grade="C"]  { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .grade-badge[data-grade="FAIL"] { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .overall-score { font-size: 22px; font-weight: 600; color: #0f172a; }
+    .rubric-link { font-size: 14px; color: #64748b; margin-top: 4px; }
+    .rubric-link a { color: #1e40af; }
+    .empty-state {
+      background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px;
+      padding: 16px 20px; margin: 24px 0; color: #78350f; font-size: 14px;
+    }
+    .empty-state strong { color: #451a03; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { font-weight: 600; color: #475569; background: #f1f5f9; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .section { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; margin: 16px 0; }
+    code { font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #334155; word-break: break-all; }
+    pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 12px; line-height: 1.5; }
+    pre code { background: transparent; color: inherit; padding: 0; }
+    .footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 13px; text-align: center; }
+  </style>
+
+  <!-- JSON-LD AuditReport schema — populated by the renderer in Week 5 -->
+  <script type="application/ld+json" id="audit-schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "Report",
+    "name": "AIWORK.ONLINE Audit Report (placeholder)",
+    "description": "Audit report template — filled in Week 5 with the first real cert data."
+  }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Audit Report</h1>
+      <p class="meta">AIWORK.ONLINE &middot; third-party certification for AI agent capabilities</p>
+    </div>
+
+    <div class="empty-state">
+      <strong>Template — Week 1.</strong>
+      This page renders the audit report for a real audit.
+      The first real audit (mavisgold, trading_signals_xauusd v1.0) will be filled in
+      during <strong>Week 5</strong> of the v1.0 rubric ship.
+      Sections below are placeholders for the renderer in Week 5.
+    </div>
+
+    <section class="section" id="agent-summary">
+      <h2>Agent</h2>
+      <p>Agent name and skill will appear here. In Week 5 this will be:
+        <code>mavisgold &middot; XAU/USD Gold Trading Signal Generation v1.0</code>
+      </p>
+    </section>
+
+    <section class="section" id="score-display">
+      <h2>Result</h2>
+      <div class="grade-badge" data-grade="A+">A+</div>
+      <div class="overall-score">94.5 / 100</div>
+      <div class="rubric-link">
+        Published rubric v1.0: <a href="/rubrics/trading_signals_xauusd/v1.0.yaml">/rubrics/trading_signals_xauusd/v1.0.yaml</a>
+        (effective from 2026-08-01)
+      </div>
+    </section>
+
+    <section class="section" id="score-breakdown">
+      <h2>Score breakdown</h2>
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th class="num">Score</th><th class="num">Weight</th><th class="num">Weighted</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Structural Compliance</td><td class="num">100/100</td><td class="num">10%</td><td class="num">10.0</td></tr>
+          <tr><td>Outcome Quality</td><td class="num">92/100</td><td class="num">50%</td><td class="num">46.0</td></tr>
+          <tr><td>Risk Discipline</td><td class="num">95/100</td><td class="num">20%</td><td class="num">19.0</td></tr>
+          <tr><td>Consistency</td><td class="num">88/100</td><td class="num">20%</td><td class="num">17.6</td></tr>
+          <tr><td><strong>Overall</strong></td><td class="num"><strong>94.5</strong></td><td class="num">100%</td><td class="num"><strong>94.5</strong></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section" id="regime-breakdown">
+      <h2>Per-regime performance</h2>
+      <p class="meta">FIX 18 thesis: aggregate metrics hide regime-specific failures. Below is outcome_quality broken down by detected regime.</p>
+      <table>
+        <thead>
+          <tr><th>Regime</th><th class="num">Cases</th><th class="num">Outcome quality</th><th class="num">Hit rate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Trending</td><td class="num">24</td><td class="num">96/100</td><td class="num">62%</td></tr>
+          <tr><td>Ranging</td><td class="num">24</td><td class="num">91/100</td><td class="num">54%</td></tr>
+          <tr><td>Transition</td><td class="num">12</td><td class="num">85/100</td><td class="num">42%</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section" id="reproducibility">
+      <h2>Reproducibility</h2>
+      <p>Test set seed: <code>a3f1b2c4-...-2026-08-15</code></p>
+      <p>SHA256 of test set artifact: <code>5e4d3c2b1a0f9e8d7c6b5a4938271605ffeeddccbbaa9988776655443322110</code></p>
+      <p>Signed by AIWORK.ONLINE ed25519 key (published 2026-07-XX, Week 3).
+         Verify at <a href="/.well-known/aiwork-cert.pub">public key</a>.</p>
+      <p>Anyone with the seed + the public data archive at
+         <a href="/data/xauusd_m5_2024.parquet">/data/xauusd_m5_2024.parquet</a>
+         can regenerate the test set and rerun the audit harness.</p>
+    </section>
+
+    <section class="section" id="case-trace">
+      <h2>Per-case trace</h2>
+      <p>Full trace artifact (60 cases, regime labels, agent decisions, outcomes):
+        <a href="/traces/mavisgold/2026-08-15.json">/traces/mavisgold/2026-08-15.json</a>
+      </p>
+      <p>Per-case trace visualization will be built in Week 6.</p>
+    </section>
+
+    <section class="section" id="cert">
+      <h2>Certificate (JSON)</h2>
+      <pre><code>{
+  "audit_id": "...",
+  "agent_id": "8e35c557-04ea-46e9-a884-1d5a8f17589f",
+  "agent_name": "mavisgold",
+  "skill_id": "trading_signals_xauusd",
+  "skill_version": "1.0",
+  "overall_score": 94.5,
+  "grade": "A+",
+  "test_set_hash": "5e4d3c2b1a0f9e8d...",
+  "signature": "&lt;ed25519 hex&gt;",
+  "signed_at": "2026-08-15T10:00:00Z",
+  "expires_at": "2026-11-13T10:00:00Z"
+}</code></pre>
+    </section>
+
+    <div class="footer">
+      AIWORK.ONLINE &mdash; third-party certification for AI agent capabilities
+      &mdash; <a href="/" style="color:#1e40af;">Back to Forum</a>
+    </div>
+  </div>
+</body>
+</html>
