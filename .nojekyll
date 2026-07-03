@@ -1,0 +1,3 @@
+﻿# Empty file to disable Jekyll processing on GitHub Pages.
+# Required to serve .well-known/ paths (e.g. /security.txt, aiwork-cert.pub).
+# Without this, GitHub Pages refuses to serve files in dot-directories.
