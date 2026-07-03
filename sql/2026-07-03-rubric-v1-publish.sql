@@ -1,29 +1,31 @@
 ﻿-- =============================================================================
--- AIWORK.ONLINE v1.0 Rubric -- Week 2 Publish
--- Date: 2026-07-03
+-- AIWORK.ONLINE v1.0 Rubric -- Week 2 Publish (idempotent)
+-- Date: 2026-07-03 (revised 2026-07-03 19:28 AEST)
 -- Builder: gambuu
 -- Reviewer: Gabriel
 -- =============================================================================
 -- WHAT THIS SCRIPT DOES
---   INSERTs one row into rubric_skills (status='published') for the
---   trading_signals_xauusd v1.0 rubric. Makes the homepage
---   "Published Rubrics" stat show 1.
+--   INSERTs (or UPDATEs if already present) one row into rubric_skills
+--   (status='published') for the trading_signals_xauusd v1.0 rubric.
+--   Makes the homepage "Published Rubrics" stat show 1.
 --
--- WHY THIS IS NEEDED
---   The table was created by Week 1 SQL but no rows were inserted.
---   The homepage "Published Rubrics" stat counts rows where status='published'.
+-- WHY IDEMPOTENT VERSION
+--   The first run (2026-07-03 19:00 AEST) succeeded but the operator
+--   re-ran the script and hit "duplicate key value violates unique
+--   constraint" on the (id) primary key. The UPSERT below is safe
+--   to re-run any number of times.
 --
 -- EXECUTION
---   Run in Supabase SQL editor. Single INSERT in a transaction. The YAML
---   content is inlined below (escaped: ' became ''). Same bytes as the
---   file at /rubrics/trading_signals_xauusd/v1.0.yaml.
+--   Run in Supabase SQL editor. Single transaction. The YAML content
+--   is inlined below (escaped: ' became ''). Same bytes as the file at
+--   /rubrics/trading_signals_xauusd/v1.0.yaml.
 -- =============================================================================
 
 BEGIN;
 
 INSERT INTO rubric_skills (
   id, family, display_name, short_description, version, effective_from,
-  superseded_by, status, rubric_yaml
+  superseded_by, status, rubric_yaml, created_at
 ) VALUES (
   'trading_signals_xauusd',
   'trading',
@@ -221,11 +223,21 @@ reproducibility:
 #     homepage "Published Rubrics" stat show 1. INSERT SQL for that row
 #     is in sql/2026-07-03-rubric-v1-publish.sql (Week 2).
 # =============================================================================
-'
-);
+',
+  '2026-07-03T09:00:44.247362+00:00'::timestamptz
+)
+ON CONFLICT (id, version) DO UPDATE SET
+  family = EXCLUDED.family,
+  display_name = EXCLUDED.display_name,
+  short_description = EXCLUDED.short_description,
+  effective_from = EXCLUDED.effective_from,
+  superseded_by = EXCLUDED.superseded_by,
+  status = EXCLUDED.status,
+  rubric_yaml = EXCLUDED.rubric_yaml;
+-- Note: created_at is NOT updated on conflict (preserves original insert timestamp).
 
 -- Verifications
-SELECT id, family, display_name, version, status, effective_from, length(rubric_yaml) AS yaml_size
+SELECT id, family, display_name, version, status, effective_from, length(rubric_yaml) AS yaml_size, created_at
 FROM rubric_skills
 WHERE id = 'trading_signals_xauusd';
 
