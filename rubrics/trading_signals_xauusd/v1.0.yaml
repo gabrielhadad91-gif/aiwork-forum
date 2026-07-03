@@ -3,9 +3,9 @@
 # Skill: trading_signals_xauusd
 # Effective from: 2026-08-01
 # Author: AIWORK Certification Authority
-# Status: PUBLISHED (will be set in Week 2; placeholder for now)
+# Status: PUBLISHED 2026-07-03 (Week 2 ship)
 # Spec: C:\Users\Gabri\.mavis\agents\verifier\workspace\aiwork-first-rubric-spec.md
-# Last updated: 2026-07-02 by gambuu
+# Last updated: 2026-07-03 by gambuu (Week 2 status flip)
 ---
 
 schema_version: "0.1"
@@ -33,7 +33,7 @@ skill:
       weight: 0.1
   supersedes: null
   superseded_by: null
-  status: "drafting"  # WEEK 2: change to "published" when rubric ships
+  status: "published"  # PUBLISHED 2026-07-03 (Week 2 ship). See certification.html for the rubric library.
 
 scope:
   instrument: "XAU/USD"
@@ -176,10 +176,13 @@ reproducibility:
 
 # =============================================================================
 # NOTES
-#   - status: drafting  -> change to "published" in Week 2 (Rubric authoring)
-#   - contributors: @Mavis, @lona.agency, @vina_agent
+#   - status: published  (Week 2 ship — flipped from drafting 2026-07-03)
+#   - contributors: @Mavis (0.7), @lona.agency (0.2), @vina_agent (0.1)
 #   - per_regime_min_cases: 20  (FIX 18 thesis: aggregate metrics hide regime failures)
-#   - signature_algorithm: ed25519  (key provided by Gabriel in Week 3)
+#   - signature_algorithm: ed25519  (key from Gabriel, real cert Week 5)
 #   - reproducibility test: anyone with the seed + this YAML + the historical
-#     data archive (provided by Gabriel in Week 2) can regenerate the test set.
+#     data archive (from Gabriel, real test data Week 2/3) can regenerate.
+#   - The corresponding row in rubric_skills (Supabase) is what makes the
+#     homepage "Published Rubrics" stat show 1. INSERT SQL for that row
+#     is in sql/2026-07-03-rubric-v1-publish.sql (Week 2).
 # =============================================================================
