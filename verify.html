@@ -47,8 +47,9 @@
     <section class="section">
       <h2>Public key</h2>
       <p>AIWORK.ONLINE ed25519 public key (raw 32-byte hex, 64 chars on a single line):</p>
-      <p><code id="pub-key">[public key not yet published — Week 3]</code></p>
-      <p>Stable URL: <a href="/.well-known/aiwork-cert.pub">/.well-known/aiwork-cert.pub</a></p>
+      <p><code id="pub-key">loading...</code></p>
+      <p>Stable URL: <a href="/.well-known/aiwork-cert.pub">/.well-known/aiwork-cert.pub</a> &middot; <span id="pub-key-status">(fetching)</span></p>
+      <p style="font-size: 13px; color: #64748b;">Fetched at page load. If the key ever rotates, this page will reflect the new value without a code change.</p>
     </section>
 
     <section class="section">
@@ -89,19 +90,34 @@
   </div>
 
   <script>
-    // WEEK 6: Implement actual ed25519 verification using libsodium.js
-    // or Web Crypto API (ed25519 was added to Web Crypto in 2024).
+    // Fetch the public key from the .well-known URL at page load.
+    // This keeps the page in sync with key rotation: if we ever publish
+    // a new key, this page picks it up automatically (no code change).
     //
-    // The verify() function will:
+    // Week 6 will add: actual ed25519 verification using Web Crypto API
+    // (ed25519 was added to Web Crypto in 2024). The verify() function will:
     //   1. Parse the cert JSON
-    //   2. Fetch /api/v1/pubkey (or read from inline constant)
+    //   2. Use this fetched key (already loaded into pubKey)
     //   3. Canonicalize the payload (sort_keys, drop signature)
     //   4. Call crypto.subtle.verify('ed25519', key, sig, payload)
-    //   5. Check expires_at > Date.now() / 1000
+    //   5. Check expires_at > Date.now()
     //   6. Check revoked_at is null
     //   7. Show pass/fail with the agent name + grade
-    //
-    // For now: show "pending" if a cert is pasted (scaffold only).
+    (async () => {
+      try {
+        const r = await fetch('/.well-known/aiwork-cert.pub', { cache: 'no-cache' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const text = (await r.text()).trim();
+        const isHex = /^[0-9a-f]{64}$/.test(text);
+        document.getElementById('pub-key').textContent = text;
+        document.getElementById('pub-key-status').textContent =
+          isHex ? 'loaded (valid hex, 64 chars)' : 'invalid format - check the file';
+      } catch (e) {
+        document.getElementById('pub-key').textContent = 'failed to load';
+        document.getElementById('pub-key-status').textContent = 'error: ' + e.message;
+      }
+    })();
+
     document.getElementById('cert-input').addEventListener('input', function(e) {
       var btn = document.getElementById('verify-btn');
       var result = document.getElementById('result');
