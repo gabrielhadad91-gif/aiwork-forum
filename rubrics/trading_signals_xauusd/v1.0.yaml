@@ -37,7 +37,7 @@ skill:
 
 scope:
   instrument: "XAU/USD"
-  timeframe_in: "M5 (5-minute bars)"
+  timeframe_in: "H1 (1-hour bars)"  # v1.0 spec said M5; shipped H1 per Gabriel's Option A on 2026-07-04
   decision_out: "BUY, SELL, or HOLD with structured fields"
   what_this_does_not_test:
     - "Order execution quality (slippage, fills) — separate audit tier"
@@ -49,18 +49,33 @@ test_generation:
   method: "historical_out_of_sample_seeded"
   description: >
     Test cases are generated from a deterministic seed by sampling real
-    historical XAU/USD M5 bars from 2024-01-01 onwards. The agent never
-    sees the dates in advance. Each test case is a contiguous window of
-    bars ending at a known market state (trend, range, or transition).
-  seed_source: "public_archive_dukascopy_xauusd_m5"
+    historical XAU/USD H1 bars from a merged archive spanning 2024-07 to
+    2026-07. The agent never sees the dates in advance. Each test case is a
+    contiguous window of H1 bars ending at a known market state (trend,
+    range, or transition). Regime is classified via 14-period ADX on the
+    full window (input + forward) and is a SCORING-ONLY label - the agent
+    never sees it.
+  seed_source: "public_archive_yahoo_finance_xauusd_h1_2024_2026_merged"
+  # NOTE on data source: the v1.0 spec said "M5 2024", but we shipped with H1
+  # 2024-2026 (per Gabriel's Option A decision on 2026-07-04) because:
+  #   - M5 download was not completed (download_xauusd.py produced H1 instead)
+  #   - H1 gives a longer test window (2.5 days context vs 8 hours) that is
+  #     harder to memorize and game
+  #   - More data (24 months vs 12) for in-sample/out-of-sample splits
+  # The M5 swap is on the v1.1 roadmap. See /v1.1-todo.md.
   cases_per_audit: 60
   distribution:
     trending_days: 0.40
     ranging_days: 0.40
-    transition_days: 0.20
-  per_regime_min_cases: 20
-  bar_count_per_case: 100  # ~8 hours of price action
-  forward_horizon_bars: 12  # ~1 hour after decision bar
+    transition_days: 0.20  # explicit transition category per FIX 18 thesis
+  per_regime_min_cases: 20  # FIX 18: "Trade count > 30 per regime" — using 20
+                            # as the cert-eligibility floor; 30 is the
+                            # recommendation, not a hard rule
+  bar_count_per_case: 60   # 60 H1 bars = ~2.5 days of price context (was 100
+                           # for M5 ~8 hours; reduced to 60 per Gabriel's
+                           # Option A on 2026-07-04)
+  forward_horizon_bars: 12  # 12 H1 bars = ~12 hours of forward scoring
+                             # (was 1 hour for M5; kept at 12 for H1)
 
 output_contract:
   format: "json"
