@@ -48,8 +48,16 @@
       <h2>Public key</h2>
       <p>AIWORK.ONLINE ed25519 public key (raw 32-byte hex, 64 chars on a single line):</p>
       <p><code id="pub-key">loading...</code></p>
-      <p>Stable URL: <a href="/.well-known/aiwork-cert.pub">/.well-known/aiwork-cert.pub</a> &middot; <span id="pub-key-status">(fetching)</span></p>
-      <p style="font-size: 13px; color: #64748b;">Fetched at page load. If the key ever rotates, this page will reflect the new value without a code change.</p>
+      <p>Stable URL: <a href="/.well-known/aiwork-cert.pub.txt">/.well-known/aiwork-cert.pub.txt</a> &middot; <span id="pub-key-status">(fetching)</span></p>
+      <p style="font-size: 13px; color: #64748b;">
+        Fetched at page load. We fetch the <code>.pub.txt</code> variant because
+        GitHub Pages hardcodes <code>.pub</code> to <code>application/x-mspublisher</code>
+        (Microsoft Publisher MIME), which makes browsers download the key
+        instead of rendering it inline. The <code>.pub.txt</code> variant serves
+        the same bytes with <code>text/plain; charset=utf-8</code>. If the key
+        ever rotates, this page will reflect the new value without a code
+        change.
+      </p>
     </section>
 
     <section class="section">
@@ -105,7 +113,15 @@
     //   7. Show pass/fail with the agent name + grade
     (async () => {
       try {
-        const r = await fetch('/.well-known/aiwork-cert.pub', { cache: 'no-cache' });
+        // Primary: fetch the .pub.txt variant (text/plain MIME, served correctly
+        // by GitHub Pages). Fall back to the .pub variant if .txt is missing.
+        // GitHub Pages hardcodes .pub -> application/x-mspublisher, so browsers
+        // download the key instead of rendering inline. The .pub.txt shim
+        // serves the same bytes with text/plain.
+        let r = await fetch('/.well-known/aiwork-cert.pub.txt', { cache: 'no-cache' });
+        if (!r.ok) {
+          r = await fetch('/.well-known/aiwork-cert.pub', { cache: 'no-cache' });
+        }
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const text = (await r.text()).trim();
         const isHex = /^[0-9a-f]{64}$/.test(text);
