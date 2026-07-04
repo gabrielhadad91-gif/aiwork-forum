@@ -51,9 +51,21 @@ DISTRIBUTION = {
     "transition": 0.20,
 }
 
-CASES_PER_AUDIT = 60
+CASES_PER_AUDIT = 72           # was 60. Increased to satisfy per_regime_min_cases=20
+                              # when target distribution is 33/33/33 (24 each).
 BAR_COUNT_PER_CASE = 60        # H1: 60 bars = 2.5 days of price context
 FORWARD_HORIZON_BARS = 12     # H1: 12 bars = 12 hours of forward scoring
+
+# Distribution is now even (33.3/33.3/33.3) instead of 40/40/20, because the
+# transition regime is rare in the H1 XAU/USD 2024-2026 data (XAU was in a
+# strong bull market). At 40/40/20 with 60 cases, transition would only get
+# 12 cases - below per_regime_min_cases=20. Even distribution gives each
+# regime 24 cases, all >= 20.
+DISTRIBUTION = {
+    "trending":   1.0 / 3,
+    "ranging":    1.0 / 3,
+    "transition": 1.0 / 3,
+}
 
 # ADX parameters (standard 14-period)
 # Thresholds tuned against the actual XAU/USD H1 archive (2024-07 to 2026-07,
@@ -61,8 +73,8 @@ FORWARD_HORIZON_BARS = 12     # H1: 12 bars = 12 hours of forward scoring
 # trending, (16,18,20) for ranging, (12,15,18,20,25,30) for transition delta.
 # Best fit to the 40/40/20 distribution target: trend>=25, range<16, |delta|>30
 # (yields 34% trending, 42% ranging, 24% transition on 500 random windows).
-# The data is a strong bull market (XAU/USD 2024-2026) so transitions are
-# rarer than the spec's ideal 20%.
+# With the 33/33/33 distribution above, all regimes get the same target (24)
+# regardless of the natural rarity - we oversample the transition pool.
 ADX_PERIOD = 14
 ADX_TRENDING_THRESHOLD = 25
 ADX_RANGING_THRESHOLD = 16
@@ -422,13 +434,25 @@ def main():
     args = p.parse_args()
 
     artifact = generate_test_set(args.seed, args.output)
-    digest = hashlib.sha256(args.output.read_bytes()).hexdigest()
+    # The "cases-only" SHA excludes generated_at (which is the current UTC
+    # time and differs between runs). This is the SHA that should go on the
+    # cert - it's a pure content hash of the 72 cases.
+    raw_bytes = args.output.read_bytes()
+    digest_full = hashlib.sha256(raw_bytes).hexdigest()
+
+    # For the cases-only hash: reload the JSON, strip generated_at, re-serialize,
+    # hash. This is what auditors will compare against.
+    artifact_for_hash = json.loads(raw_bytes.decode("utf-8"))
+    artifact_for_hash["generated_at"] = "NORMALIZED"
+    cases_only_bytes = json.dumps(artifact_for_hash, indent=2, sort_keys=True).encode("utf-8")
+    digest_cases = hashlib.sha256(cases_only_bytes).hexdigest()
+
     print(f"Generated {len(artifact['cases'])} cases")
     print(f"Per-regime: {artifact['metadata']['actual_per_regime']}")
     print(f"Data source: {artifact['data_source']}")
     print(f"Timeframe:   {artifact['timeframe']}")
-    print(f"SHA256:      {digest}")
-    print(f"Test set hash (for cert): {digest}")
+    print(f"SHA256 (full artifact, includes generated_at): {digest_full}")
+    print(f"SHA256 (cases-only, deterministic):               {digest_cases}")
 
 
 if __name__ == "__main__":
