@@ -63,11 +63,17 @@ test_generation:
   #     harder to memorize and game
   #   - More data (24 months vs 12) for in-sample/out-of-sample splits
   # The M5 swap is on the v1.1 roadmap. See /v1.1-todo.md.
-  cases_per_audit: 60
+  cases_per_audit: 72          # was 60. Increased to satisfy per_regime_min_cases=20
+                              # when each regime gets 24 cases (33/33/33 split).
   distribution:
-    trending_days: 0.40
-    ranging_days: 0.40
-    transition_days: 0.20  # explicit transition category per FIX 18 thesis
+    trending_days:   0.333
+    ranging_days:    0.333
+    transition_days: 0.334  # explicit transition category per FIX 18 thesis.
+                             # Even distribution (was 40/40/20) because the H1
+                             # XAU/USD 2024-2026 data has rare mid-state
+                             # transitions (XAU was in a strong bull market).
+                             # 60 cases at 40/40/20 would put transition at 12
+                             # cases, below per_regime_min_cases=20.
   per_regime_min_cases: 20  # FIX 18: "Trade count > 30 per regime" — using 20
                             # as the cert-eligibility floor; 30 is the
                             # recommendation, not a hard rule
